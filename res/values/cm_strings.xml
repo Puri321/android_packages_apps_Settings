@@ -215,6 +215,10 @@ two in order to insert additional control points. \'Remove\' deletes the selecte
     <string name="gestures_double_spen_title_head">Double tap</string>
     <string name="gestures_double_spen_summary_head">Launch custom action on double tap</string>
 
+    <!-- Performance : Force translucent bars -->
+    <string name="pref_force_translucent_title">Force translucent bars</string>
+    <string name="pref_force_translucent_summary">Enables transparent status/navigation bar (requires reboot)</string>
+
     <!-- Gestures Options -->
     <string name="gestures_action_empty">No action</string>
     <string name="gestures_action_home">Emulate home key</string>

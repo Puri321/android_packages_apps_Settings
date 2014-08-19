@@ -45,9 +45,12 @@ public class PerformanceSettings extends SettingsPreferenceFragment {
 
     private static final String FORCE_HIGHEND_GFX_PREF = "pref_force_highend_gfx";
     private static final String FORCE_HIGHEND_GFX_PERSIST_PROP = "persist.sys.force_highendgfx";
+    private static final String FORCE_TRANSLUCENT_PREF = "pref_force_translucent";
+    private static final String FORCE_TRANSLUCENT_PERSIST_PROP = "persist.sys.force_transbar";
 
     private CheckBoxPreference mUse16bppAlphaPref;
     private CheckBoxPreference mForceHighEndGfx;
+    private CheckBoxPreference mForceTranslucent;
 
     private AlertDialog alertDialog;
 
@@ -80,23 +83,42 @@ public class PerformanceSettings extends SettingsPreferenceFragment {
             prefSet.removePreference(findPreference(FORCE_HIGHEND_GFX_PREF));
         }
 
-            /* Display the warning dialog 
-            alertDialog = new AlertDialog.Builder(getActivity()).create();
-            alertDialog.setTitle(R.string.performance_settings_warning_title);
-            alertDialog.setMessage(getResources().getString(R.string.performance_settings_warning));
-            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE,
-                    getResources().getString(com.android.internal.R.string.ok),
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            return;
-                        }
-                    });
-            alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                public void onCancel(DialogInterface dialog) {
-                    PerformanceSettings.this.finish();
-                }
-            });
-            alertDialog.show();*/
+        mForceTranslucent = (CheckBoxPreference) prefSet.findPreference(FORCE_TRANSLUCENT_PREF);
+        String forceTranslucent = SystemProperties.get(FORCE_TRANSLUCENT_PERSIST_PROP, "true");
+        mForceTranslucent.setChecked("true".equals(forceTranslucent));
+
+        /* Display the warning dialog */
+        alertDialog = new AlertDialog.Builder(getActivity()).create();
+        alertDialog.setTitle(R.string.performance_settings_warning_title);
+        alertDialog.setMessage(getResources().getString(R.string.performance_settings_warning));
+        alertDialog.setCancelable(false);
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE,
+                getResources().getString(com.android.internal.R.string.ok),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        return;
+                    }
+                });
+        alertDialog.show();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mPerfProfilePref != null) {
+            setCurrentValue();
+            ContentResolver resolver = getActivity().getContentResolver();
+            resolver.registerContentObserver(Settings.Secure.getUriFor(
+                    Settings.Secure.PERFORMANCE_PROFILE), false, mPerformanceProfileObserver);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mPerfProfilePref != null) {
+            ContentResolver resolver = getActivity().getContentResolver();
+            resolver.unregisterContentObserver(mPerformanceProfileObserver);
         }
     }
 
@@ -108,6 +130,9 @@ public class PerformanceSettings extends SettingsPreferenceFragment {
         } else if (preference == mForceHighEndGfx) {
             SystemProperties.set(FORCE_HIGHEND_GFX_PERSIST_PROP,
                     mForceHighEndGfx.isChecked() ? "true" : "false");
+        } else if (preference == mForceTranslucent) {
+            SystemProperties.set(FORCE_TRANSLUCENT_PERSIST_PROP,
+                    mForceTranslucent.isChecked() ? "true" : "false");
         } else {
             // If we didn't handle it, let preferences handle it.
             return super.onPreferenceTreeClick(preferenceScreen, preference);
