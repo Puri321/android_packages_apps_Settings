@@ -45,6 +45,7 @@ public class PerformanceSettings extends SettingsPreferenceFragment {
 
     private static final String FORCE_HIGHEND_GFX_PREF = "pref_force_highend_gfx";
     private static final String FORCE_HIGHEND_GFX_PERSIST_PROP = "persist.sys.force_highendgfx";
+
     private static final String FORCE_TRANSLUCENT_PREF = "pref_force_translucent";
     private static final String FORCE_TRANSLUCENT_PERSIST_PROP = "persist.sys.force_transbar";
 
@@ -87,38 +88,23 @@ public class PerformanceSettings extends SettingsPreferenceFragment {
         String forceTranslucent = SystemProperties.get(FORCE_TRANSLUCENT_PERSIST_PROP, "true");
         mForceTranslucent.setChecked("true".equals(forceTranslucent));
 
-        /* Display the warning dialog */
-        alertDialog = new AlertDialog.Builder(getActivity()).create();
-        alertDialog.setTitle(R.string.performance_settings_warning_title);
-        alertDialog.setMessage(getResources().getString(R.string.performance_settings_warning));
-        alertDialog.setCancelable(false);
-        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE,
-                getResources().getString(com.android.internal.R.string.ok),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        return;
-                    }
-                });
-        alertDialog.show();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mPerfProfilePref != null) {
-            setCurrentValue();
-            ContentResolver resolver = getActivity().getContentResolver();
-            resolver.registerContentObserver(Settings.Secure.getUriFor(
-                    Settings.Secure.PERFORMANCE_PROFILE), false, mPerformanceProfileObserver);
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (mPerfProfilePref != null) {
-            ContentResolver resolver = getActivity().getContentResolver();
-            resolver.unregisterContentObserver(mPerformanceProfileObserver);
+            /* Display the warning dialog 
+            alertDialog = new AlertDialog.Builder(getActivity()).create();
+            alertDialog.setTitle(R.string.performance_settings_warning_title);
+            alertDialog.setMessage(getResources().getString(R.string.performance_settings_warning));
+            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE,
+                    getResources().getString(com.android.internal.R.string.ok),
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            return;
+                        }
+                    });
+            alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                public void onCancel(DialogInterface dialog) {
+                    PerformanceSettings.this.finish();
+                }
+            });
+            alertDialog.show();*/
         }
     }
 
